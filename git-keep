@@ -1,0 +1,38 @@
+#!/bin/sh
+
+#
+# git keep - Add a directory to git
+#
+
+set -e
+
+SELF="keep"
+KEEP=".gitkeep"
+TEXT="# Tracked on $(date time '+%z')"
+
+err() {
+	echo "ERROR: $@" 1>&2
+}
+
+die() {
+	err "$@"
+	exit 1
+}
+
+keep() {
+	touch "${1}"
+	git add "${1}"
+	git commit -m "${TEXT}" "${1}"
+}
+
+if [ ! "$#" -eq "2" ]
+then
+	die "'${SELF}' expects exactly ONE argument: <directory>"
+fi
+
+if [! -d "$1" ]
+then
+	die "'$1' is not a valid directory"
+fi
+
+keep "${KEEP}"
