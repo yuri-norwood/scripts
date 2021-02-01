@@ -11,11 +11,11 @@ KEEP=".gitkeep"
 TEXT="# Tracked on $(date +%Y-%m-%d)"
 
 err() {
-	echo "ERROR: $@" 1>&2
+	echo "ERROR: $*" 1>&2
 }
 
 die() {
-	err "$@"
+	err "$*"
 	exit 1
 }
 
@@ -24,7 +24,7 @@ then
 	die "'${SELF}' expects exactly ONE argument: <directory>"
 fi
 
-if [! -d "$1" ]
+if [ ! -d "$1" ]
 then
 	die "'$1' is not a valid directory"
 fi
