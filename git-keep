@@ -19,13 +19,7 @@ die() {
 	exit 1
 }
 
-keep() {
-	touch "${1}"
-	git add "${1}"
-	git commit -m "${TEXT}" "${1}"
-}
-
-if [ ! "$#" -eq "2" ]
+if [ ! "$#" -eq "1" ]
 then
 	die "'${SELF}' expects exactly ONE argument: <directory>"
 fi
@@ -35,5 +29,8 @@ then
 	die "'$1' is not a valid directory"
 fi
 
-keep "${KEEP}"
+mkdir -p "${1}"
+touch "${1}/${KEEP}"
+git add "${1}/${KEEP}"
+git commit -m "${TEXT}" "${1}/${KEEP}"
 
