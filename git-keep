@@ -8,7 +8,7 @@ set -e
 
 SELF="keep"
 KEEP=".gitkeep"
-TEXT="# Tracked on $(date time '+%z')"
+TEXT="# Tracked on $(date +%Y-%m-%d)"
 
 err() {
 	echo "ERROR: $@" 1>&2
@@ -36,3 +36,4 @@ then
 fi
 
 keep "${KEEP}"
+
