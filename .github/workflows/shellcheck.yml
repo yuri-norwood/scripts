@@ -14,8 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: shellcheck git-keep
+      - name: shellcheck
         uses: ludeeus/action-shellcheck@master
         with:
           severity: error
-          additional_files: git-keep
