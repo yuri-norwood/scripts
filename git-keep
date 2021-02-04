@@ -29,7 +29,6 @@ then
 	die "'$1' is not a valid directory"
 fi
 
-mkdir -p "${1}"
 echo "${TEXT}" > "${1}/${KEEP}"
 git add "${1}/${KEEP}"
 git commit -m "Added ${1}" "${1}/${KEEP}"
