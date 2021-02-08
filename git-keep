@@ -3,6 +3,20 @@
 #
 # git keep - Add a directory to git
 #
+# usage:
+# 	git keep [OPTIONS] DIR1 [DIR2 DIR3 ...]
+#
+# options:
+# 	-m
+# 		Call `mkdir -p` on every DIR to ensure it exists before
+# 		attempting to keep them.
+#
+# DIRS:
+# 	The directory or directories to keep, at least one must be
+# 	provided, and duplicates are ignored, the last instance of each
+# 	DIR found is used. This may affect the timestamp if run at exactly
+# 	midnight, but should otherwise be of no consequence.
+#
 
 set -e
 
@@ -19,17 +33,28 @@ die() {
 	exit 1
 }
 
-if [ ! "$#" -eq "1" ]
-then
-	die "'${SELF}' expects exactly ONE argument: <directory>"
-fi
+keep() {
+	if [ ! -d "$1" ]
+	then
+		if [ "$MKDIR" = "TRUE" ]
+		then
+			mkdir -p "$1"
+		else
+			die "'$1' is not a valid directory"
+		fi
+	fi
 
-if [ ! -d "$1" ]
-then
-	die "'$1' is not a valid directory"
-fi
+	echo "${TEXT}" > "${1}/${KEEP}"
+	git add "${1}/${KEEP}"
+	git commit -m "Added ${1}" "${1}/${KEEP}"
+}
 
-echo "${TEXT}" > "${1}/${KEEP}"
-git add "${1}/${KEEP}"
-git commit -m "Added ${1}" "${1}/${KEEP}"
+while [ "$#" -gt 0 ]
+do
+	case "$1" in
+		"-m") MKDIR="TRUE" ;;
+		*)    keep "$1"    ;;
+	esac
 
+	shift
+done
