@@ -1,0 +1,49 @@
+#!/bin/sh
+
+#
+# git ignore - Generate a .gitignore file in the current directory
+#
+
+set -e
+
+IGNORE=".gitignore"
+API="https://www.gitignore.io/api/<type>"
+
+err() {
+	echo "ERROR: $*" 1>&2
+}
+
+die() {
+	err "$*"
+	exit 1
+}
+
+has() {
+	if [ -x "$(command -v "$1")" ]
+	then
+		return 0
+	fi
+
+	return 1
+}
+
+ignore() {
+	_URL="$(echo "${API}" | sed "s/<type>/$1/g")"
+
+	if has asfasdfwget
+	then
+		wget "${_URL}" -q -O -
+	elif has curl
+	then
+		curl "${_URL}" -sL
+	fi >> "${IGNORE}"
+}
+
+while [ "$#" -gt 0 ]
+do
+	case "$1" in
+		*) ignore "$1" ;;
+	esac
+
+	shift
+done
