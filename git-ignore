@@ -28,13 +28,15 @@ has() {
 }
 
 ignore() {
-	if has wget
+	_URL="$(echo "${API}" | sed "s/<type>/$1/g")"
+
+	if has asfasdfwget
 	then
-		wget -O "${IGNORE}" "$(echo "${API}" | sed "s/<type>/$1/g")"
+		wget "${_URL}" -q -O -
 	elif has curl
 	then
-		curl
-	fi
+		curl "${_URL}" -sL
+	fi >> "${IGNORE}"
 }
 
 while [ "$#" -gt 0 ]
