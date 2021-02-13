@@ -8,6 +8,7 @@ set -e
 
 SELF="ignore"
 IGNORE=".gitignore"
+API="https://www.gitignore.io/api/<type>"
 
 err() {
 	echo "ERROR: $*" 1>&2
@@ -19,6 +20,7 @@ die() {
 }
 
 ignore() {
+	echo "${API}" | sed "s/<type>/$1/g"
 }
 
 while [ "$#" -gt 0 ]
