@@ -6,7 +6,6 @@
 
 set -e
 
-SELF="ignore"
 IGNORE=".gitignore"
 API="https://www.gitignore.io/api/<type>"
 
@@ -19,8 +18,23 @@ die() {
 	exit 1
 }
 
+has() {
+	if [ -x "$(command -v "$1")" ]
+	then
+		return 0
+	fi
+
+	return 1
+}
+
 ignore() {
-	echo "${API}" | sed "s/<type>/$1/g"
+	if has wget
+	then
+		wget -O "${IGNORE}" "$(echo "${API}" | sed "s/<type>/$1/g")"
+	elif has curl
+	then
+		curl
+	fi
 }
 
 while [ "$#" -gt 0 ]
