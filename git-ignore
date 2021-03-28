@@ -30,7 +30,7 @@ has() {
 ignore() {
 	_URL="$(echo "${API}" | sed "s/<type>/$1/g")"
 
-	if has asfasdfwget
+	if has wget
 	then
 		wget "${_URL}" -q -O -
 	elif has curl
