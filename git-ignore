@@ -37,6 +37,9 @@ ignore() {
 	then
 		curl "${_URL}" -sL
 	fi >> "${IGNORE}"
+
+	git add "${IGNORE}"
+	git commit -m "Ignore ${1} artifacts" "${IGNORE}"
 }
 
 while [ "$#" -gt 0 ]
