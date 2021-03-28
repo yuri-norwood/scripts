@@ -45,8 +45,33 @@ ignore() {
 while [ "$#" -gt 0 ]
 do
 	case "$1" in
-		*) ignore "$1" ;;
+		'-m')
+			MKDIR="TRUE"
+		;;
+		'-d'|'-dm'|'-md')
+			if [ ! "$2" ]
+			then
+				die "flag '$1' expects '<DIR>' argument"
+			fi
+
+			if [ "$MKDIR" = "TRUE" ] || [ "$1" = "-dm" ] || [ "$1" = "-md" ]
+			then
+				mkdir -p "$2"
+			fi
+
+			if [ ! -d "$2" ]
+			then
+				die "flag '$1' requires existing directory, got: '$2'"
+			fi
+
+			ignore "$1"
+
+			shift # pop $1 so $2 gets popped later
+		;;
+		*)
+			ignore "$1"
+		;;
 	esac
 
-	shift
+	shift # pop $1
 done
