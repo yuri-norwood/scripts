@@ -64,6 +64,13 @@ has() {
 ignore() {
 	_URL="$(echo "${API}" | sed "s/<type>/$1/g")"
 
+	if [ -d "$DIR" ]
+	then
+		_FILE="${DIR}/${IGNORE}"
+	else
+		_FILE="${IGNORE}"
+	fi
+
 	if [ "$1" = "all" ]
 	then
 		cat <<- "EOF"
@@ -79,10 +86,10 @@ ignore() {
 	elif has curl
 	then
 		curl "${_URL}" -sL
-	fi >> "${IGNORE}"
+	fi >> "${_FILE}"
 
-	git add "${IGNORE}"
-	git commit -m "Ignore ${1} artifacts" "${IGNORE}"
+	git add "${_FILE}"
+	git commit -m "Ignore ${1} artifacts" "${_FILE}"
 }
 
 while [ "$#" -gt 0 ]
@@ -106,6 +113,8 @@ do
 			then
 				die "flag '$1' requires existing directory, got: '$2'"
 			fi
+
+			DIR="$2"
 
 			ignore "$1"
 
