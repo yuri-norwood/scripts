@@ -3,6 +3,40 @@
 #
 # git ignore - Generate a .gitignore file in the current directory
 #
+# usage:
+# 	git ignore [OPTIONS] TYPE1 [TYPE2 TYPE3 ...] 
+#
+# options:
+# 	-d <DIR>
+# 		Specify a directory to create the next .gitignore file
+# 		in. This specifies that all further .gitignore changes
+# 		are to target the directory <DIR>. To change to another
+# 		directory, -d may be specified again with a new DIR, or
+# 		"." may be passed to reset DIR back to CUR.
+#
+# 	-m
+# 		Call `mkdir -p` on every DIR to ensure it exists before
+# 		attempting to ignore within them. This effect lasts for
+# 		all following -d flags.
+#
+# 		Note: if -m is passed together with -d, (-md <DIR> or
+# 		-dm <DIR>), then the effect of -m is only applied to
+# 		that specific <DIR>, before returning to the previous
+# 		directory behaviour (erroring by default).
+#
+# TYPES:
+#	The type of files to add to the selected .gitignore file(s). This
+# 	may be any type allowed by the API, as well as any of the several
+# 	hardcoded magic values.
+#
+# 	all:
+# 		Adds a rule to ignore all files except the .gitignore
+# 		file itself.
+#
+# 	MISC:
+# 		See the url in the 'API' variable for more information
+# 		on the types available via the api..
+#
 
 set -e
 
@@ -30,20 +64,66 @@ has() {
 ignore() {
 	_URL="$(echo "${API}" | sed "s/<type>/$1/g")"
 
-	if has wget
+	if [ -d "$DIR" ]
+	then
+		_FILE="${DIR}/${IGNORE}"
+	else
+		_FILE="${IGNORE}"
+	fi
+
+	if [ "$1" = "all" ]
+	then
+		cat <<- "EOF"
+			# Ignore all files...
+			*
+
+			# ...except this .gitignore
+			!.gitignore
+		EOF
+	elif has wget
 	then
 		wget "${_URL}" -q -O -
 	elif has curl
 	then
 		curl "${_URL}" -sL
-	fi >> "${IGNORE}"
+	fi >> "${_FILE}"
+
+	git add "${_FILE}"
+	git commit -m "Ignore ${1} artifacts" "${_FILE}"
 }
 
 while [ "$#" -gt 0 ]
 do
 	case "$1" in
-		*) ignore "$1" ;;
+		'-m')
+			MKDIR="TRUE"
+		;;
+		'-d'|'-dm'|'-md')
+			if [ ! "$2" ]
+			then
+				die "flag '$1' expects '<DIR>' argument"
+			fi
+
+			if [ "$MKDIR" = "TRUE" ] || [ "$1" = "-dm" ] || [ "$1" = "-md" ]
+			then
+				mkdir -p "$2"
+			fi
+
+			if [ ! -d "$2" ]
+			then
+				die "flag '$1' requires existing directory, got: '$2'"
+			fi
+
+			DIR="$2"
+
+			ignore "$1"
+
+			shift # pop $1 so $2 gets popped later
+		;;
+		*)
+			ignore "$1"
+		;;
 	esac
 
-	shift
+	shift # pop $1
 done
