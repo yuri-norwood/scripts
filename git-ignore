@@ -64,7 +64,16 @@ has() {
 ignore() {
 	_URL="$(echo "${API}" | sed "s/<type>/$1/g")"
 
-	if has wget
+	if [ "$1" = "all" ]
+	then
+		cat <<- "EOF"
+			# Ignore all files...
+			*
+
+			# ...except this .gitignore
+			!.gitignore
+		EOF
+	elif has wget
 	then
 		wget "${_URL}" -q -O -
 	elif has curl
